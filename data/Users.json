@@ -1,0 +1,28 @@
+{
+  "teachers": [
+    {
+      "id": "T001",
+      "name": "Dr. Priya Sharma",
+      "email": "priya.sharma@school.edu",
+      "password": "teacher123",
+      "subject": "Mathematics",
+      "classes": ["10-A", "10-B", "11-A"]
+    },
+    {
+      "id": "T002",
+      "name": "Mr. Rajesh Kumar",
+      "email": "rajesh.kumar@school.edu",
+      "password": "teacher456",
+      "subject": "Science",
+      "classes": ["9-A", "9-B", "10-A"]
+    },
+    {
+      "id": "T003",
+      "name": "Ms. Anita Verma",
+      "email": "anita.verma@school.edu",
+      "password": "teacher789",
+      "subject": "English",
+      "classes": ["11-A", "11-B", "12-A"]
+    }
+  ]
+}

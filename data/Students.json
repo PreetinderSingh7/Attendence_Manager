@@ -1,0 +1,105 @@
+{
+  "students": [
+    {
+      "id": "S001",
+      "name": "Aarav Singh",
+      "rollNo": "101",
+      "class": "10-A",
+      "email": "aarav.singh@student.edu",
+      "phone": "9876543210",
+      "parentName": "Ramesh Singh",
+      "parentPhone": "9876543200"
+    },
+    {
+      "id": "S002",
+      "name": "Diya Mehta",
+      "rollNo": "102",
+      "class": "10-A",
+      "email": "diya.mehta@student.edu",
+      "phone": "9876543211",
+      "parentName": "Suresh Mehta",
+      "parentPhone": "9876543201"
+    },
+    {
+      "id": "S003",
+      "name": "Kabir Nair",
+      "rollNo": "103",
+      "class": "10-A",
+      "email": "kabir.nair@student.edu",
+      "phone": "9876543212",
+      "parentName": "Vikram Nair",
+      "parentPhone": "9876543202"
+    },
+    {
+      "id": "S004",
+      "name": "Ishaan Patel",
+      "rollNo": "104",
+      "class": "10-B",
+      "email": "ishaan.patel@student.edu",
+      "phone": "9876543213",
+      "parentName": "Dinesh Patel",
+      "parentPhone": "9876543203"
+    },
+    {
+      "id": "S005",
+      "name": "Riya Gupta",
+      "rollNo": "105",
+      "class": "10-B",
+      "email": "riya.gupta@student.edu",
+      "phone": "9876543214",
+      "parentName": "Anil Gupta",
+      "parentPhone": "9876543204"
+    },
+    {
+      "id": "S006",
+      "name": "Arjun Reddy",
+      "rollNo": "201",
+      "class": "11-A",
+      "email": "arjun.reddy@student.edu",
+      "phone": "9876543215",
+      "parentName": "Suresh Reddy",
+      "parentPhone": "9876543205"
+    },
+    {
+      "id": "S007",
+      "name": "Sneha Iyer",
+      "rollNo": "202",
+      "class": "11-A",
+      "email": "sneha.iyer@student.edu",
+      "phone": "9876543216",
+      "parentName": "Mohan Iyer",
+      "parentPhone": "9876543206"
+    },
+    {
+      "id": "S008",
+      "name": "Vivaan Joshi",
+      "rollNo": "301",
+      "class": "9-A",
+      "email": "vivaan.joshi@student.edu",
+      "phone": "9876543217",
+      "parentName": "Pradeep Joshi",
+      "parentPhone": "9876543207"
+    },
+    {
+      "id": "S009",
+      "name": "Ananya Sharma",
+      "rollNo": "302",
+      "class": "9-A",
+      "email": "ananya.sharma@student.edu",
+      "phone": "9876543218",
+      "parentName": "Deepak Sharma",
+      "parentPhone": "9876543208"
+    },
+    {
+      "id": "S010",
+      "name": "Rohan Mishra",
+      "rollNo": "401",
+      "class": "12-A",
+      "email": "rohan.mishra@student.edu",
+      "phone": "9876543219",
+      "parentName": "Sanjay Mishra",
+      "parentPhone": "9876543209"
+    }
+  ],
+  "attendance": {}
+}

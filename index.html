@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AttendEase — Attendance Manager</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <!-- SheetJS for Excel parsing -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+
+<!-- ============================================
+     LOGIN PAGE
+============================================ -->
+<div id="login-page">
+  <div class="login-card">
+
+    <div class="login-logo">
+      <div class="logo-icon">🎓</div>
+      <h1>AttendEase<span>School Attendance System</span></h1>
+    </div>
+
+    <h2>Teacher Login</h2>
+    <p class="subtitle">Sign in to manage your classes and attendance records.</p>
+
+    <div id="login-error" class="hidden" style="background:var(--danger-light);border:1px solid rgba(192,57,43,0.2);color:var(--danger);padding:0.7rem 1rem;border-radius:var(--radius);font-size:0.85rem;margin-bottom:1rem;">
+      ❌ Invalid email or password. Please try again.
+    </div>
+
+    <form id="login-form">
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="login-email" placeholder="teacher@school.edu" required autocomplete="username" />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="login-pass" placeholder="Enter your password" required autocomplete="current-password" />
+      </div>
+      <button type="submit" class="btn btn-primary" style="margin-top:0.5rem">Sign In →</button>
+    </form>
+
+    <div style="margin-top:1.5rem;padding-top:1.2rem;border-top:1px solid var(--border);">
+      <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:0.6rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;">Demo Credentials</p>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <code style="font-size:0.78rem;background:var(--surface-2);padding:0.3rem 0.6rem;border-radius:6px;color:var(--text-muted)">priya.sharma@school.edu / teacher123</code>
+        <code style="font-size:0.78rem;background:var(--surface-2);padding:0.3rem 0.6rem;border-radius:6px;color:var(--text-muted)">rajesh.kumar@school.edu / teacher456</code>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================
+     DASHBOARD
+============================================ -->
+<div id="dashboard" class="hidden">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand">
+        <div class="brand-icon">🎓</div>
+        <h2>AttendEase<span>Management System</span></h2>
+      </div>
+    </div>
+
+    <div class="teacher-info">
+      <div class="t-name" id="teacher-name">Teacher Name</div>
+      <div class="t-subject" id="teacher-subject">Subject</div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <button class="nav-item active" data-page="overview">
+        <span class="nav-icon">📊</span><span>Overview</span>
+      </button>
+      <button class="nav-item" data-page="take">
+        <span class="nav-icon">✅</span><span>Take Attendance</span>
+      </button>
+
+      <div class="nav-section-label">Manage</div>
+      <button class="nav-item" data-page="students">
+        <span class="nav-icon">👥</span><span>Students</span>
+      </button>
+      <button class="nav-item" data-page="reports">
+        <span class="nav-icon">📈</span><span>Reports</span>
+      </button>
+
+      <div class="nav-section-label">Import</div>
+      <button class="nav-item" data-page="upload">
+        <span class="nav-icon">📤</span><span>Upload Excel</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button id="logout-btn" class="nav-item" style="color:rgba(255,255,255,0.5)">
+        <span class="nav-icon">🚪</span><span>Logout</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+
+    <!-- TOP BAR -->
+    <header class="top-bar">
+      <div class="top-bar-left">
+        <h2 id="topbar-title">Welcome</h2>
+        <span id="topbar-subtitle">Dashboard Overview</span>
+      </div>
+      <div class="top-bar-right">
+        <div class="date-badge" id="date-badge">Today</div>
+      </div>
+    </header>
+
+    <!-- PAGE CONTENT -->
+    <div class="page-content">
+
+      <!-- ======== PAGE: OVERVIEW ======== -->
+      <div id="page-overview" class="page-section">
+        <div class="stats-grid">
+          <div class="stat-card blue">
+            <div class="stat-icon">👥</div>
+            <div class="stat-value" id="stat-students">—</div>
+            <div class="stat-label">My Students</div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-icon">🏫</div>
+            <div class="stat-value" id="stat-classes">—</div>
+            <div class="stat-label">My Classes</div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-icon">✅</div>
+            <div class="stat-value" id="stat-present">—</div>
+            <div class="stat-label">Present Today</div>
+          </div>
+          <div class="stat-card red">
+            <div class="stat-icon">❌</div>
+            <div class="stat-value" id="stat-absent">—</div>
+            <div class="stat-label">Absent Today</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3>Today's Class Summary</h3>
+            <button class="btn btn-secondary btn-sm" onclick="App.navigateTo('take')">Take Attendance →</button>
+          </div>
+          <div class="card-body">
+            <div id="class-summary"></div>
+          </div>
+        </div>
+
+        <style>
+          .class-row { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:0.8rem 0; border-bottom:1px solid var(--border); }
+          .class-row:last-child { border-bottom:none; }
+          .class-row-info strong { display:block; font-size:0.9rem; }
+          .class-row-info span { font-size:0.78rem; color:var(--text-muted); }
+          .class-row-bar { display:flex; align-items:center; gap:8px; min-width:160px; }
+          .class-row-bar small { font-size:0.78rem; color:var(--text-muted); font-weight:600; min-width:30px; text-align:right; }
+          .class-row-bar .progress-bar { flex:1; }
+        </style>
+      </div>
+
+      <!-- ======== PAGE: TAKE ATTENDANCE ======== -->
+      <div id="page-take" class="page-section hidden">
+        <div class="card" style="margin-bottom:1.5rem">
+          <div class="card-header">
+            <h3>📋 Mark Attendance</h3>
+          </div>
+          <div class="card-body">
+            <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:flex-end">
+              <div class="form-group" style="margin:0;flex:1;min-width:160px">
+                <label>Class</label>
+                <select id="att-class-select"></select>
+              </div>
+              <div class="form-group" style="margin:0;flex:1;min-width:160px">
+                <label>Date</label>
+                <input type="date" id="att-date" />
+              </div>
+              <button id="att-load-btn" class="btn btn-primary" style="width:auto">Load Students</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3>Students</h3>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              <span id="att-counter" style="font-size:0.8rem;color:var(--text-muted);font-weight:500"></span>
+              <button id="mark-all-present" class="btn btn-success btn-sm">✓ All Present</button>
+              <button id="mark-all-absent"  class="btn btn-danger  btn-sm">✗ All Absent</button>
+              <button id="att-save-btn"     class="btn btn-primary  btn-sm">💾 Save</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div id="att-student-list">
+              <div class="empty-state">
+                <div class="empty-icon">📋</div>
+                <h3>Select a class and date</h3>
+                <p>Choose the class and date to begin marking attendance</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======== PAGE: STUDENTS ======== -->
+      <div id="page-students" class="page-section hidden">
+        <div class="card">
+          <div class="card-header">
+            <h3>👥 Student Directory</h3>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+              <div class="search-bar">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="student-search" placeholder="Search students..." />
+              </div>
+              <select id="student-class-filter" style="padding:0.5rem 0.8rem;border:1.5px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:0.85rem;background:var(--surface)"></select>
+              <button id="add-student-btn" class="btn btn-primary btn-sm">+ Add Student</button>
+            </div>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Roll No</th>
+                  <th>Name</th>
+                  <th>Class</th>
+                  <th>Phone</th>
+                  <th>Attendance %</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="student-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======== PAGE: REPORTS ======== -->
+      <div id="page-reports" class="page-section hidden">
+        <div class="card" style="margin-bottom:1.5rem">
+          <div class="card-header">
+            <h3>🔍 Filters</h3>
+          </div>
+          <div class="card-body">
+            <div class="report-filters">
+              <div class="form-group" style="margin:0">
+                <label>Class</label>
+                <select id="report-class-filter"></select>
+              </div>
+              <div class="form-group" style="margin:0">
+                <label>Date (single day)</label>
+                <input type="date" id="report-date-filter" />
+              </div>
+              <button id="report-clear-date" class="btn btn-secondary btn-sm">Clear Date</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3>📈 Attendance Report</h3>
+            <button class="btn btn-secondary btn-sm" onclick="Pages.reports.exportCSV && Pages.reports.exportCSV()">⬇ Export CSV</button>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Roll No</th>
+                  <th>Name</th>
+                  <th>Class</th>
+                  <th>Present</th>
+                  <th>Absent</th>
+                  <th>Late</th>
+                  <th>Overall %</th>
+                </tr>
+              </thead>
+              <tbody id="report-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======== PAGE: UPLOAD EXCEL ======== -->
+      <div id="page-upload" class="page-section hidden">
+        <div class="card" style="margin-bottom:1.5rem">
+          <div class="card-header"><h3>⚙️ Upload Settings</h3></div>
+          <div class="card-body">
+            <div class="form-group" style="max-width:300px">
+              <label>Target Class</label>
+              <select id="upload-class"></select>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><h3>📤 Import Students from Excel / CSV</h3></div>
+          <div class="card-body">
+
+            <div class="upload-zone" id="drop-zone">
+              <input type="file" id="file-input" accept=".xlsx,.xls,.csv" />
+              <div class="upload-icon">📄</div>
+              <h3>Drop your file here or click to browse</h3>
+              <p>Supports Excel (.xlsx, .xls) and CSV files<br>
+                 Columns: <strong>Name, Roll No, Phone, Parent Name, Parent Phone</strong></p>
+            </div>
+
+            <div style="margin-top:1rem;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;">
+              <p style="font-size:0.82rem;color:var(--text-muted);font-weight:600;margin-bottom:0.5rem;text-transform:uppercase;letter-spacing:0.05em">Expected Excel Format</p>
+              <div class="table-wrapper">
+                <table>
+                  <thead><tr><th>Name</th><th>Roll No</th><th>Phone</th><th>Parent Name</th><th>Parent Phone</th></tr></thead>
+                  <tbody>
+                    <tr><td>Aarav Singh</td><td>101</td><td>9876543210</td><td>Ramesh Singh</td><td>9876543200</td></tr>
+                    <tr><td>Diya Mehta</td><td>102</td><td>9876543211</td><td>Suresh Mehta</td><td>9876543201</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div id="upload-preview"></div>
+            <div style="margin-top:1rem">
+              <button id="upload-import-btn" class="btn btn-primary hidden">⬆ Import Students</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /page-content -->
+  </div><!-- /main-content -->
+</div><!-- /dashboard -->
+
+
+<!-- ======== STUDENT MODAL ======== -->
+<div id="student-modal" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-student-title">Add Student</h3>
+      <button class="modal-close" id="close-student-modal">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="student-modal-id" />
+      <div class="form-group">
+        <label>Full Name *</label>
+        <input type="text" id="student-modal-name" placeholder="e.g. Aarav Singh" />
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div class="form-group">
+          <label>Roll Number *</label>
+          <input type="text" id="student-modal-roll" placeholder="e.g. 101" />
+        </div>
+        <div class="form-group">
+          <label>Class *</label>
+          <select id="student-modal-class"></select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Student Phone</label>
+        <input type="tel" id="student-modal-phone" placeholder="10-digit mobile number" />
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div class="form-group">
+          <label>Parent / Guardian Name</label>
+          <input type="text" id="student-modal-parent" placeholder="Parent name" />
+        </div>
+        <div class="form-group">
+          <label>Parent Phone</label>
+          <input type="tel" id="student-modal-pphone" placeholder="Parent phone" />
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="cancel-student-btn">Cancel</button>
+      <button class="btn btn-primary" id="save-student-btn">Save Student</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
