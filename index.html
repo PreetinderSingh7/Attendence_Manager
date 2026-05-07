@@ -3,381 +3,1912 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AttendEase — Attendance Manager</title>
-  <link rel="stylesheet" href="css/style.css" />
-  <!-- SheetJS for Excel parsing -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <title>AttendEase — Smart School Attendance Management</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================================
+       ATTENDEASE LANDING PAGE
+       Aesthetic: Refined Academic Dark — Deep forest greens,
+       warm cream, editorial typography, subtle grain texture
+    ============================================================ */
+
+    :root {
+      --ink:       #0e1a14;
+      --forest:    #1c3a28;
+      --green:     #2d5a3d;
+      --sage:      #4a7c5f;
+      --mint:      #7db89a;
+      --cream:     #f5f0e8;
+      --warm:      #ede7d8;
+      --gold:      #c9a84c;
+      --gold-lt:   #f0d98a;
+      --white:     #ffffff;
+      --muted:     rgba(245,240,232,0.55);
+      --border-dk: rgba(245,240,232,0.12);
+      --border-lt: rgba(14,26,20,0.12);
+      --r:         12px;
+      --r-lg:      20px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Sora', sans-serif;
+      background: var(--ink);
+      color: var(--cream);
+      overflow-x: hidden;
+    }
+
+    /* ---- GRAIN OVERLAY ---- */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.035;
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    /* ============================================================
+       NAVBAR
+    ============================================================ */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 500;
+      padding: 0 2.5rem;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(14,26,20,0.85);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border-dk);
+      transition: all 0.3s ease;
+    }
+
+    nav.scrolled {
+      height: 62px;
+      background: rgba(14,26,20,0.97);
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .nav-brand .logo-box {
+      width: 36px; height: 36px;
+      background: var(--green);
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.08);
+    }
+
+    .nav-brand span {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--cream);
+      letter-spacing: -0.01em;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: color 0.2s;
+      letter-spacing: 0.01em;
+    }
+
+    .nav-links a:hover { color: var(--cream); }
+
+    .nav-cta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-nav-outline {
+      padding: 0.5rem 1.2rem;
+      border: 1.5px solid var(--border-dk);
+      border-radius: 8px;
+      color: var(--cream);
+      background: transparent;
+      font-family: 'Sora', sans-serif;
+      font-size: 0.83rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+    .btn-nav-outline:hover {
+      border-color: rgba(245,240,232,0.4);
+      background: rgba(245,240,232,0.06);
+    }
+
+    .btn-nav-solid {
+      padding: 0.5rem 1.3rem;
+      border: none;
+      border-radius: 8px;
+      background: var(--gold);
+      color: var(--ink);
+      font-family: 'Sora', sans-serif;
+      font-size: 0.83rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      box-shadow: 0 2px 12px rgba(201,168,76,0.35);
+    }
+    .btn-nav-solid:hover {
+      background: var(--gold-lt);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 18px rgba(201,168,76,0.45);
+    }
+
+    /* Mobile menu toggle */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .hamburger span {
+      display: block;
+      width: 22px; height: 2px;
+      background: var(--cream);
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+
+    /* ============================================================
+       HERO
+    ============================================================ */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 8rem 2rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Radial glow background */
+    #hero::before {
+      content: '';
+      position: absolute;
+      top: -10%; left: 50%;
+      transform: translateX(-50%);
+      width: 900px; height: 700px;
+      background: radial-gradient(ellipse, rgba(45,90,61,0.35) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    /* Grid lines */
+    #hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(245,240,232,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(245,240,232,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, black 30%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0.4rem 1rem;
+      border: 1px solid rgba(201,168,76,0.35);
+      border-radius: 100px;
+      background: rgba(201,168,76,0.08);
+      color: var(--gold-lt);
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 1.8rem;
+      animation: fadeUp 0.7s ease both;
+    }
+
+    .hero-pill .dot {
+      width: 6px; height: 6px;
+      background: var(--gold);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    h1.hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.8rem, 7vw, 5.2rem);
+      font-weight: 900;
+      line-height: 1.05;
+      color: var(--cream);
+      letter-spacing: -0.02em;
+      margin-bottom: 1.4rem;
+      animation: fadeUp 0.7s 0.1s ease both;
+    }
+
+    h1.hero-title em {
+      font-style: italic;
+      color: var(--mint);
+    }
+
+    .hero-sub {
+      font-size: clamp(0.95rem, 2vw, 1.15rem);
+      color: var(--muted);
+      line-height: 1.75;
+      max-width: 560px;
+      margin: 0 auto 2.5rem;
+      font-weight: 300;
+      animation: fadeUp 0.7s 0.2s ease both;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      animation: fadeUp 0.7s 0.3s ease both;
+    }
+
+    .btn-hero-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0.9rem 2rem;
+      background: var(--gold);
+      color: var(--ink);
+      border: none;
+      border-radius: var(--r);
+      font-family: 'Sora', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 4px 24px rgba(201,168,76,0.4);
+      transition: all 0.25s;
+    }
+    .btn-hero-primary:hover {
+      background: var(--gold-lt);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(201,168,76,0.5);
+    }
+
+    .btn-hero-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0.9rem 2rem;
+      background: transparent;
+      color: var(--cream);
+      border: 1.5px solid var(--border-dk);
+      border-radius: var(--r);
+      font-family: 'Sora', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.25s;
+    }
+    .btn-hero-secondary:hover {
+      border-color: rgba(245,240,232,0.35);
+      background: rgba(245,240,232,0.05);
+    }
+
+    /* Hero stats strip */
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border-dk);
+      animation: fadeUp 0.7s 0.45s ease both;
+    }
+
+    .hero-stat .num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--cream);
+      display: block;
+    }
+
+    .hero-stat .lbl {
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-top: 2px;
+      display: block;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(22px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ============================================================
+       SECTION COMMONS
+    ============================================================ */
+    section {
+      padding: 6rem 2rem;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--mint);
+      margin-bottom: 1rem;
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.9rem, 4vw, 2.8rem);
+      font-weight: 700;
+      color: var(--cream);
+      line-height: 1.15;
+      margin-bottom: 1rem;
+    }
+
+    .section-sub {
+      font-size: 1rem;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 540px;
+      font-weight: 300;
+    }
+
+    /* ============================================================
+       FEATURES
+    ============================================================ */
+    #features {
+      background: var(--forest);
+      position: relative;
+      overflow: hidden;
+    }
+
+    #features::before {
+      content: '';
+      position: absolute;
+      right: -200px; top: -200px;
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(45,90,61,0.4) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .features-header {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .feature-card {
+      background: rgba(14,26,20,0.6);
+      border: 1px solid var(--border-dk);
+      border-radius: var(--r-lg);
+      padding: 2rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      border-radius: var(--r-lg) var(--r-lg) 0 0;
+      background: linear-gradient(90deg, var(--green), var(--mint));
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .feature-card:hover {
+      border-color: rgba(122,184,154,0.25);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+    }
+
+    .feature-card:hover::before { opacity: 1; }
+
+    .feature-icon {
+      width: 48px; height: 48px;
+      background: rgba(45,90,61,0.5);
+      border: 1px solid rgba(122,184,154,0.2);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      margin-bottom: 1.3rem;
+    }
+
+    .feature-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      color: var(--cream);
+      margin-bottom: 0.6rem;
+      font-weight: 700;
+    }
+
+    .feature-card p {
+      font-size: 0.87rem;
+      color: var(--muted);
+      line-height: 1.7;
+      font-weight: 300;
+    }
+
+    /* ============================================================
+       HOW IT WORKS
+    ============================================================ */
+    #how {
+      background: var(--ink);
+    }
+
+    .how-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: center;
+    }
+
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .step {
+      display: flex;
+      gap: 1.2rem;
+      align-items: flex-start;
+    }
+
+    .step-num {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      background: var(--green);
+      border: 2px solid rgba(122,184,154,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--mint);
+      flex-shrink: 0;
+    }
+
+    .step-body h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      color: var(--cream);
+      margin-bottom: 0.35rem;
+    }
+
+    .step-body p {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.65;
+      font-weight: 300;
+    }
+
+    .how-visual {
+      position: relative;
+    }
+
+    .mock-card {
+      background: var(--forest);
+      border: 1px solid var(--border-dk);
+      border-radius: var(--r-lg);
+      padding: 1.5rem;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+    }
+
+    .mock-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 1.3rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-dk);
+    }
+
+    .mock-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+    .mock-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.88rem;
+      color: var(--cream);
+      margin-left: auto;
+    }
+
+    .mock-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0.65rem 0.8rem;
+      border-radius: 8px;
+      margin-bottom: 6px;
+      background: rgba(14,26,20,0.5);
+      border: 1px solid var(--border-dk);
+    }
+
+    .mock-avatar {
+      width: 30px; height: 30px;
+      border-radius: 8px;
+      background: var(--green);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem;
+      color: var(--mint);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .mock-name {
+      font-size: 0.8rem;
+      color: var(--cream);
+      font-weight: 500;
+      flex: 1;
+    }
+
+    .mock-badge {
+      padding: 0.2rem 0.6rem;
+      border-radius: 100px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    .mb-p { background: rgba(39,174,96,0.2); color: #5ddb87; }
+    .mb-a { background: rgba(192,57,43,0.2); color: #e07070; }
+    .mb-l { background: rgba(212,130,26,0.2); color: #e8b04a; }
+
+    /* ============================================================
+       ABOUT
+    ============================================================ */
+    #about {
+      background: var(--forest);
+      position: relative;
+      overflow: hidden;
+    }
+
+    #about::after {
+      content: '';
+      position: absolute;
+      bottom: -150px; left: -150px;
+      width: 500px; height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(45,90,61,0.3) 0%, transparent 70%);
+    }
+
+    .about-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: center;
+    }
+
+    .about-text .section-sub {
+      max-width: 100%;
+      margin-bottom: 1.5rem;
+    }
+
+    .about-values {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .value-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    .value-icon {
+      width: 32px; height: 32px;
+      background: rgba(45,90,61,0.6);
+      border: 1px solid rgba(122,184,154,0.2);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    .about-image-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 1rem;
+    }
+
+    .about-card {
+      background: rgba(14,26,20,0.7);
+      border: 1px solid var(--border-dk);
+      border-radius: var(--r-lg);
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .about-card:first-child {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      text-align: left;
+    }
+
+    .about-card .big-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: var(--mint);
+      line-height: 1;
+    }
+
+    .about-card .lbl {
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .about-card .desc {
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-weight: 300;
+      line-height: 1.5;
+    }
+
+    /* ============================================================
+       TESTIMONIALS
+    ============================================================ */
+    #testimonials {
+      background: var(--ink);
+    }
+
+    .testimonials-header {
+      text-align: center;
+      margin-bottom: 3.5rem;
+    }
+
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .testimonial {
+      background: var(--forest);
+      border: 1px solid var(--border-dk);
+      border-radius: var(--r-lg);
+      padding: 1.8rem;
+      position: relative;
+    }
+
+    .testimonial::before {
+      content: '"';
+      position: absolute;
+      top: 1rem; right: 1.3rem;
+      font-family: 'Playfair Display', serif;
+      font-size: 4rem;
+      color: var(--green);
+      line-height: 1;
+    }
+
+    .testimonial p {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.75;
+      margin-bottom: 1.3rem;
+      font-weight: 300;
+    }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .t-avatar {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: var(--green);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--mint);
+      flex-shrink: 0;
+    }
+
+    .t-name { font-size: 0.85rem; color: var(--cream); font-weight: 600; }
+    .t-role { font-size: 0.75rem; color: var(--muted); margin-top: 1px; }
+
+    .stars { color: var(--gold); font-size: 0.85rem; margin-bottom: 0.9rem; }
+
+    /* ============================================================
+       CONTACT
+    ============================================================ */
+    #contact {
+      background: var(--forest);
+    }
+
+    .contact-layout {
+      display: grid;
+      grid-template-columns: 1fr 1.3fr;
+      gap: 5rem;
+      align-items: start;
+    }
+
+    .contact-info h2 { margin-bottom: 1rem; }
+    .contact-info .section-sub { margin-bottom: 2rem; }
+
+    .contact-methods {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .contact-method {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .cm-icon {
+      width: 38px; height: 38px;
+      background: rgba(45,90,61,0.7);
+      border: 1px solid rgba(122,184,154,0.2);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .cm-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+    .cm-value { font-size: 0.88rem; color: var(--cream); margin-top: 2px; }
+
+    .contact-form {
+      background: rgba(14,26,20,0.6);
+      border: 1px solid var(--border-dk);
+      border-radius: var(--r-lg);
+      padding: 2rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .cf-group {
+      margin-bottom: 1.2rem;
+    }
+
+    .cf-group label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .cf-group input,
+    .cf-group select,
+    .cf-group textarea {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: rgba(14,26,20,0.7);
+      border: 1.5px solid var(--border-dk);
+      border-radius: var(--r);
+      color: var(--cream);
+      font-family: 'Sora', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 300;
+      outline: none;
+      transition: all 0.2s;
+      resize: none;
+    }
+
+    .cf-group input::placeholder,
+    .cf-group textarea::placeholder { color: rgba(245,240,232,0.3); }
+
+    .cf-group input:focus,
+    .cf-group select:focus,
+    .cf-group textarea:focus {
+      border-color: var(--sage);
+      background: rgba(14,26,20,0.9);
+      box-shadow: 0 0 0 3px rgba(74,124,95,0.2);
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 0.85rem;
+      background: var(--gold);
+      color: var(--ink);
+      border: none;
+      border-radius: var(--r);
+      font-family: 'Sora', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s;
+      box-shadow: 0 4px 18px rgba(201,168,76,0.35);
+    }
+    .btn-submit:hover {
+      background: var(--gold-lt);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(201,168,76,0.45);
+    }
+
+    /* ============================================================
+       CTA BANNER
+    ============================================================ */
+    #cta {
+      background: var(--ink);
+      padding: 5rem 2rem;
+    }
+
+    .cta-box {
+      background: linear-gradient(135deg, var(--forest) 0%, var(--green) 100%);
+      border: 1px solid rgba(122,184,154,0.2);
+      border-radius: 24px;
+      padding: 4rem 3rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .cta-box::before {
+      content: '';
+      position: absolute;
+      top: -80px; right: -80px;
+      width: 280px; height: 280px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(201,168,76,0.15) 0%, transparent 70%);
+    }
+
+    .cta-box h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      color: var(--cream);
+      margin-bottom: 0.8rem;
+    }
+
+    .cta-box p {
+      font-size: 0.98rem;
+      color: rgba(245,240,232,0.7);
+      margin-bottom: 2rem;
+      font-weight: 300;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* ============================================================
+       FOOTER
+    ============================================================ */
+    footer {
+      background: rgba(10,18,14,0.95);
+      border-top: 1px solid var(--border-dk);
+      padding: 3rem 2rem 2rem;
+    }
+
+    .footer-grid {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      gap: 2.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .footer-brand p {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.65;
+      margin-top: 0.8rem;
+      font-weight: 300;
+    }
+
+    .footer-col h4 {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    .footer-col a {
+      display: block;
+      font-size: 0.82rem;
+      color: rgba(245,240,232,0.45);
+      text-decoration: none;
+      margin-bottom: 0.6rem;
+      transition: color 0.2s;
+    }
+    .footer-col a:hover { color: var(--cream); }
+
+    .footer-bottom {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border-dk);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: rgba(245,240,232,0.3);
+    }
+
+    /* ============================================================
+       LOGIN MODAL (overlays on landing)
+    ============================================================ */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(8px);
+      z-index: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal {
+      background: var(--forest);
+      border: 1px solid var(--border-dk);
+      border-radius: var(--r-lg);
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+      transform: scale(0.95) translateY(10px);
+      transition: transform 0.3s ease;
+      overflow: hidden;
+    }
+
+    .modal-overlay.active .modal {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal-top {
+      background: var(--ink);
+      padding: 2rem 2rem 1.5rem;
+      text-align: center;
+      border-bottom: 1px solid var(--border-dk);
+    }
+
+    .modal-logo {
+      width: 52px; height: 52px;
+      background: var(--green);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem;
+      margin: 0 auto 1rem;
+      box-shadow: 0 0 0 4px rgba(45,90,61,0.3);
+    }
+
+    .modal-top h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      color: var(--cream);
+      margin-bottom: 0.3rem;
+    }
+
+    .modal-top p {
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-weight: 300;
+    }
+
+    .modal-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border-dk);
+    }
+
+    .modal-tab {
+      flex: 1;
+      padding: 0.9rem;
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: 'Sora', sans-serif;
+      transition: all 0.2s;
+      border-bottom: 2px solid transparent;
+    }
+    .modal-tab.active {
+      color: var(--mint);
+      border-bottom-color: var(--mint);
+      background: rgba(122,184,154,0.05);
+    }
+
+    .modal-body { padding: 1.8rem 2rem; }
+
+    .modal-error {
+      background: rgba(192,57,43,0.15);
+      border: 1px solid rgba(192,57,43,0.3);
+      color: #e07070;
+      padding: 0.7rem 1rem;
+      border-radius: var(--r);
+      font-size: 0.82rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    .modal-error.show { display: block; }
+
+    .modal-success {
+      background: rgba(39,174,96,0.15);
+      border: 1px solid rgba(39,174,96,0.3);
+      color: #5ddb87;
+      padding: 0.7rem 1rem;
+      border-radius: var(--r);
+      font-size: 0.82rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    .modal-success.show { display: block; }
+
+    .mf-group { margin-bottom: 1.1rem; }
+
+    .mf-group label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--muted);
+      margin-bottom: 0.45rem;
+    }
+
+    .mf-group input {
+      width: 100%;
+      padding: 0.7rem 1rem;
+      background: rgba(14,26,20,0.7);
+      border: 1.5px solid var(--border-dk);
+      border-radius: var(--r);
+      color: var(--cream);
+      font-family: 'Sora', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 300;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .mf-group input::placeholder { color: rgba(245,240,232,0.25); }
+    .mf-group input:focus {
+      border-color: var(--sage);
+      box-shadow: 0 0 0 3px rgba(74,124,95,0.2);
+    }
+
+    .btn-modal {
+      width: 100%;
+      padding: 0.82rem;
+      background: var(--gold);
+      color: var(--ink);
+      border: none;
+      border-radius: var(--r);
+      font-family: 'Sora', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s;
+      margin-top: 0.5rem;
+      box-shadow: 0 4px 18px rgba(201,168,76,0.35);
+    }
+    .btn-modal:hover { background: var(--gold-lt); transform: translateY(-1px); }
+
+    .modal-footer-note {
+      text-align: center;
+      margin-top: 1rem;
+      font-size: 0.78rem;
+      color: rgba(245,240,232,0.3);
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 1rem; right: 1rem;
+      background: rgba(245,240,232,0.06);
+      border: 1px solid var(--border-dk);
+      border-radius: 8px;
+      width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--muted);
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .modal-close-btn:hover { background: rgba(245,240,232,0.12); color: var(--cream); }
+
+    .demo-creds {
+      margin-top: 1rem;
+      padding: 0.8rem 1rem;
+      background: rgba(14,26,20,0.6);
+      border-radius: var(--r);
+      border: 1px solid var(--border-dk);
+    }
+    .demo-creds p { font-size: 0.72rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
+    .demo-creds code { font-size: 0.72rem; color: rgba(245,240,232,0.5); display: block; margin-bottom: 2px; }
+
+    /* ============================================================
+       RESPONSIVE
+    ============================================================ */
+    @media (max-width: 900px) {
+      .how-layout, .about-layout, .contact-layout { grid-template-columns: 1fr; gap: 2.5rem; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .how-visual { display: none; }
+      nav { padding: 0 1.2rem; }
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .nav-cta .btn-nav-outline { display: none; }
+    }
+
+    @media (max-width: 600px) {
+      .footer-grid { grid-template-columns: 1fr; }
+      .hero-stats { flex-direction: column; gap: 1.2rem; align-items: center; }
+      .form-row { grid-template-columns: 1fr; }
+      .about-image-grid { grid-template-columns: 1fr; }
+      .about-card:first-child { grid-column: unset; }
+      .cta-box { padding: 2.5rem 1.5rem; }
+      section { padding: 4rem 1.2rem; }
+    }
+
+    /* Scroll animations */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+  </style>
 </head>
 <body>
 
-<!-- ============================================
-     LOGIN PAGE
-============================================ -->
-<div id="login-page">
-  <div class="login-card">
+  <!-- ============================================================
+       NAVBAR
+  ============================================================ -->
+  <nav id="navbar">
+    <a href="#" class="nav-brand">
+      <div class="logo-box">🎓</div>
+      <span>AttendEase</span>
+    </a>
 
-    <div class="login-logo">
-      <div class="logo-icon">🎓</div>
-      <h1>AttendEase<span>School Attendance System</span></h1>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#how">How It Works</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#testimonials">Testimonials</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+
+    <div class="nav-cta">
+      <a href="#" class="btn-nav-outline" onclick="openModal('signin'); return false;">Sign In</a>
+      <a href="#" class="btn-nav-solid"   onclick="openModal('signup'); return false;">Sign Up Free</a>
     </div>
 
-    <h2>Teacher Login</h2>
-    <p class="subtitle">Sign in to manage your classes and attendance records.</p>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
 
-    <div id="login-error" class="hidden" style="background:var(--danger-light);border:1px solid rgba(192,57,43,0.2);color:var(--danger);padding:0.7rem 1rem;border-radius:var(--radius);font-size:0.85rem;margin-bottom:1rem;">
-      ❌ Invalid email or password. Please try again.
+
+  <!-- ============================================================
+       HERO
+  ============================================================ -->
+  <section id="hero">
+    <div class="hero-content">
+      <div class="hero-pill">
+        <span class="dot"></span>
+        Trusted by 500+ Schools across India
+      </div>
+
+      <h1 class="hero-title">
+        Attendance,<br><em>Simplified</em> for<br>Modern Schools
+      </h1>
+
+      <p class="hero-sub">
+        AttendEase gives teachers a beautiful, fast way to track attendance,
+        manage students, and generate reports — all from a single, elegant dashboard.
+      </p>
+
+      <div class="hero-buttons">
+        <a href="#" class="btn-hero-primary" onclick="openModal('signup'); return false;">
+          🚀 Get Started Free
+        </a>
+        <a href="#how" class="btn-hero-secondary">
+          See How It Works ↓
+        </a>
+      </div>
+
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="num">50K+</span>
+          <span class="lbl">Students Tracked</span>
+        </div>
+        <div class="hero-stat">
+          <span class="num">500+</span>
+          <span class="lbl">Schools</span>
+        </div>
+        <div class="hero-stat">
+          <span class="num">99.9%</span>
+          <span class="lbl">Uptime</span>
+        </div>
+        <div class="hero-stat">
+          <span class="num">3 min</span>
+          <span class="lbl">Setup Time</span>
+        </div>
+      </div>
     </div>
+  </section>
 
-    <form id="login-form">
-      <div class="form-group">
-        <label>Email Address</label>
-        <input type="email" id="login-email" placeholder="teacher@school.edu" required autocomplete="username" />
-      </div>
-      <div class="form-group">
-        <label>Password</label>
-        <input type="password" id="login-pass" placeholder="Enter your password" required autocomplete="current-password" />
-      </div>
-      <button type="submit" class="btn btn-primary" style="margin-top:0.5rem">Sign In →</button>
-    </form>
 
-    <div style="margin-top:1.5rem;padding-top:1.2rem;border-top:1px solid var(--border);">
-      <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:0.6rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;">Demo Credentials</p>
-      <div style="display:flex;flex-direction:column;gap:4px;">
-        <code style="font-size:0.78rem;background:var(--surface-2);padding:0.3rem 0.6rem;border-radius:6px;color:var(--text-muted)">priya.sharma@school.edu / teacher123</code>
-        <code style="font-size:0.78rem;background:var(--surface-2);padding:0.3rem 0.6rem;border-radius:6px;color:var(--text-muted)">rajesh.kumar@school.edu / teacher456</code>
+  <!-- ============================================================
+       FEATURES
+  ============================================================ -->
+  <section id="features">
+    <div class="container">
+      <div class="features-header reveal">
+        <div class="section-label">What We Offer</div>
+        <h2 class="section-title">Everything a teacher needs,<br>nothing they don't</h2>
+        <p class="section-sub" style="margin:0 auto">Built specifically for Indian schools, AttendEase handles the entire student attendance lifecycle — from marking to reporting.</p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card reveal">
+          <div class="feature-icon">🔐</div>
+          <h3>Secure Teacher Login</h3>
+          <p>Role-based access ensures only authorised teachers can log in and manage their assigned classes. No student data is ever exposed.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon">✅</div>
+          <h3>One-tap Attendance</h3>
+          <p>Mark every student Present, Absent, or Late in seconds. Bulk-mark an entire class with a single button, or adjust individually.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon">📤</div>
+          <h3>Excel & CSV Import</h3>
+          <p>Upload your existing student roster from Excel (.xlsx) or CSV files. AttendEase auto-maps columns and skips duplicates intelligently.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon">📈</div>
+          <h3>Instant Reports</h3>
+          <p>See per-student attendance percentages with colour-coded indicators. Filter by class or date. Export summaries for parents or administration.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon">👥</div>
+          <h3>Student Management</h3>
+          <p>Add, edit, and remove students. Search by name or roll number. Each profile stores contact details for both student and parent.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon">📱</div>
+          <h3>Works Everywhere</h3>
+          <p>Fully responsive — works perfectly on desktop, tablet, and mobile browsers. No app install required. Open and go.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       HOW IT WORKS
+  ============================================================ -->
+  <section id="how">
+    <div class="container">
+      <div class="how-layout">
+        <div>
+          <div class="section-label reveal">How It Works</div>
+          <h2 class="section-title reveal">Up and running in under 3 minutes</h2>
+          <p class="section-sub reveal" style="margin-bottom:2.5rem">No training needed. No complex setup. Just open, log in, and start marking attendance today.</p>
+
+          <div class="steps">
+            <div class="step reveal">
+              <div class="step-num">1</div>
+              <div class="step-body">
+                <h4>Create your teacher account</h4>
+                <p>Sign up in seconds with your school email. Your account is linked to the classes you teach — no one else can see your data.</p>
+              </div>
+            </div>
+            <div class="step reveal">
+              <div class="step-num">2</div>
+              <div class="step-body">
+                <h4>Add or import your students</h4>
+                <p>Type students in manually, or drop your existing Excel roster into the Import page. All data is preserved safely.</p>
+              </div>
+            </div>
+            <div class="step reveal">
+              <div class="step-num">3</div>
+              <div class="step-body">
+                <h4>Take attendance daily</h4>
+                <p>Pick a class and date, mark each student, hit Save. The system accumulates data over time automatically.</p>
+              </div>
+            </div>
+            <div class="step reveal">
+              <div class="step-num">4</div>
+              <div class="step-body">
+                <h4>View reports anytime</h4>
+                <p>Open the Reports page to see per-student summaries, filter by date, and spot students with low attendance instantly.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="how-visual reveal">
+          <div class="mock-card">
+            <div class="mock-header">
+              <div class="mock-dot" style="background:#e07070"></div>
+              <div class="mock-dot" style="background:#e8b04a"></div>
+              <div class="mock-dot" style="background:#5ddb87"></div>
+              <span class="mock-title">Class 10-A · Today</span>
+            </div>
+            <div class="mock-row">
+              <div class="mock-avatar">AS</div>
+              <span class="mock-name">Aarav Singh</span>
+              <span class="mock-badge mb-p">Present</span>
+            </div>
+            <div class="mock-row">
+              <div class="mock-avatar">DM</div>
+              <span class="mock-name">Diya Mehta</span>
+              <span class="mock-badge mb-p">Present</span>
+            </div>
+            <div class="mock-row">
+              <div class="mock-avatar">KN</div>
+              <span class="mock-name">Kabir Nair</span>
+              <span class="mock-badge mb-a">Absent</span>
+            </div>
+            <div class="mock-row">
+              <div class="mock-avatar">IP</div>
+              <span class="mock-name">Ishaan Patel</span>
+              <span class="mock-badge mb-l">Late</span>
+            </div>
+            <div class="mock-row">
+              <div class="mock-avatar">RG</div>
+              <span class="mock-name">Riya Gupta</span>
+              <span class="mock-badge mb-p">Present</span>
+            </div>
+            <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid rgba(245,240,232,0.08);display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:0.75rem;color:var(--muted)">4 Present · 1 Absent · 1 Late</span>
+              <button style="background:var(--gold);color:var(--ink);border:none;padding:0.4rem 1rem;border-radius:8px;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif">Save ✓</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       ABOUT
+  ============================================================ -->
+  <section id="about">
+    <div class="container">
+      <div class="about-layout">
+        <div class="about-text">
+          <div class="section-label reveal">About Us</div>
+          <h2 class="section-title reveal">Built by educators,<br>for educators</h2>
+          <p class="section-sub reveal">
+            AttendEase was born from a real frustration — watching teachers spend 15–20 minutes every morning wrestling with paper registers, spreadsheets, and chaotic WhatsApp groups just to track who showed up to class.
+          </p>
+          <p class="section-sub reveal" style="margin-top:0.8rem">
+            We set out to build something that feels as natural as flipping open a register — but smarter, faster, and always with you.
+          </p>
+
+          <div class="about-values">
+            <div class="value-item reveal">
+              <div class="value-icon">🎯</div>
+              <span>Purpose-built for Indian school workflows and class structures</span>
+            </div>
+            <div class="value-item reveal">
+              <div class="value-icon">🔒</div>
+              <span>Teacher-only access — student privacy is non-negotiable</span>
+            </div>
+            <div class="value-item reveal">
+              <div class="value-icon">⚡</div>
+              <span>Zero setup cost — works in any browser, no installation</span>
+            </div>
+            <div class="value-item reveal">
+              <div class="value-icon">🌱</div>
+              <span>Actively developed with feedback from real teachers</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="about-image-grid reveal">
+          <div class="about-card">
+            <div>
+              <div class="big-num">500+</div>
+              <div class="lbl">Schools</div>
+            </div>
+            <div class="desc">Across Himachal Pradesh, Punjab, Delhi, Haryana and beyond — schools trust AttendEase daily.</div>
+          </div>
+          <div class="about-card">
+            <div class="big-num">50K</div>
+            <div class="lbl">Students</div>
+          </div>
+          <div class="about-card">
+            <div class="big-num">98%</div>
+            <div class="lbl">Satisfaction</div>
+          </div>
+          <div class="about-card">
+            <div class="big-num">2023</div>
+            <div class="lbl">Founded</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       TESTIMONIALS
+  ============================================================ -->
+  <section id="testimonials">
+    <div class="container">
+      <div class="testimonials-header reveal">
+        <div class="section-label">Testimonials</div>
+        <h2 class="section-title">Teachers love it</h2>
+        <p class="section-sub" style="margin:0 auto">Don't take our word for it — here's what educators across India say about AttendEase.</p>
+      </div>
+
+      <div class="testimonials-grid">
+        <div class="testimonial reveal">
+          <div class="stars">★★★★★</div>
+          <p>I used to spend the first 20 minutes of every class taking attendance on paper. Now it takes me 90 seconds on my phone. My students actually noticed I'm less stressed in the mornings!</p>
+          <div class="testimonial-author">
+            <div class="t-avatar">PS</div>
+            <div>
+              <div class="t-name">Dr. Priya Sharma</div>
+              <div class="t-role">Mathematics Teacher, Shimla</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial reveal">
+          <div class="stars">★★★★★</div>
+          <p>The Excel import feature saved us hours of work when we onboarded. We imported 400 students across 12 classes in about 10 minutes. The interface is very clean and intuitive.</p>
+          <div class="testimonial-author">
+            <div class="t-avatar">RK</div>
+            <div>
+              <div class="t-name">Mr. Rajesh Kumar</div>
+              <div class="t-role">Science Teacher, Chandigarh</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial reveal">
+          <div class="stars">★★★★★</div>
+          <p>Our principal now asks for weekly attendance reports. With AttendEase I can generate one in 30 seconds — filtered by class, sorted by percentage. It's made me look very organised!</p>
+          <div class="testimonial-author">
+            <div class="t-avatar">AV</div>
+            <div>
+              <div class="t-name">Ms. Anita Verma</div>
+              <div class="t-role">English Teacher, Solan</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       CONTACT
+  ============================================================ -->
+  <section id="contact">
+    <div class="container">
+      <div class="contact-layout">
+        <div class="contact-info">
+          <div class="section-label reveal">Get In Touch</div>
+          <h2 class="section-title reveal">We'd love to hear from you</h2>
+          <p class="section-sub reveal">Have a question, a feature request, or need help getting started? Our team responds within 24 hours.</p>
+
+          <div class="contact-methods">
+            <div class="contact-method reveal">
+              <div class="cm-icon">📧</div>
+              <div>
+                <div class="cm-label">Email</div>
+                <div class="cm-value">hello@attendease.in</div>
+              </div>
+            </div>
+            <div class="contact-method reveal">
+              <div class="cm-icon">📱</div>
+              <div>
+                <div class="cm-label">Phone</div>
+                <div class="cm-value">+91 98765 43210</div>
+              </div>
+            </div>
+            <div class="contact-method reveal">
+              <div class="cm-icon">📍</div>
+              <div>
+                <div class="cm-label">Location</div>
+                <div class="cm-value">Solan, Himachal Pradesh, India</div>
+              </div>
+            </div>
+            <div class="contact-method reveal">
+              <div class="cm-icon">⏰</div>
+              <div>
+                <div class="cm-label">Support Hours</div>
+                <div class="cm-value">Mon–Sat, 9am – 6pm IST</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="contact-form reveal">
+          <div id="contact-success" class="modal-success">✅ Message sent! We'll get back to you within 24 hours.</div>
+          <div class="form-row">
+            <div class="cf-group">
+              <label>First Name</label>
+              <input type="text" id="cf-fname" placeholder="Aarav" />
+            </div>
+            <div class="cf-group">
+              <label>Last Name</label>
+              <input type="text" id="cf-lname" placeholder="Singh" />
+            </div>
+          </div>
+          <div class="cf-group">
+            <label>Email</label>
+            <input type="email" id="cf-email" placeholder="you@school.edu" />
+          </div>
+          <div class="cf-group">
+            <label>School Name</label>
+            <input type="text" id="cf-school" placeholder="Your school name" />
+          </div>
+          <div class="cf-group">
+            <label>Message</label>
+            <textarea id="cf-message" rows="4" placeholder="Tell us how we can help..."></textarea>
+          </div>
+          <button class="btn-submit" onclick="submitContact()">Send Message →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       CTA BANNER
+  ============================================================ -->
+  <section id="cta">
+    <div class="container">
+      <div class="cta-box reveal">
+        <h2>Ready to modernise your classroom?</h2>
+        <p>Join 500+ schools already using AttendEase. Free forever for individual teachers.</p>
+        <div class="cta-buttons">
+          <a href="#" class="btn-hero-primary" onclick="openModal('signup'); return false;">
+            🎓 Start for Free Today
+          </a>
+          <a href="#contact" class="btn-hero-secondary">Talk to Us</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       FOOTER
+  ============================================================ -->
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="#" class="nav-brand" style="margin-bottom:0.5rem;display:inline-flex">
+          <div class="logo-box" style="width:32px;height:32px;font-size:1rem">🎓</div>
+          <span style="font-size:1.1rem;margin-left:8px">AttendEase</span>
+        </a>
+        <p>Smart, simple attendance management for modern Indian schools. Built with ♥ in Himachal Pradesh.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Product</h4>
+        <a href="#features">Features</a>
+        <a href="#how">How It Works</a>
+        <a href="#" onclick="openModal('signup'); return false;">Sign Up Free</a>
+        <a href="index.html">Go to Dashboard</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="#about">About Us</a>
+        <a href="#testimonials">Testimonials</a>
+        <a href="#contact">Contact</a>
+        <a href="#">Privacy Policy</a>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <a href="#">Help Center</a>
+        <a href="#">Excel Import Guide</a>
+        <a href="#">FAQs</a>
+        <a href="#contact">Report a Bug</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 AttendEase. All rights reserved.</span>
+      <span>Made in 🇮🇳 Solan, HP</span>
+    </div>
+  </footer>
+
+
+  <!-- ============================================================
+       LOGIN / SIGNUP MODAL
+  ============================================================ -->
+  <div class="modal-overlay" id="auth-modal" onclick="closeAuthModal(event)">
+    <div class="modal" style="position:relative">
+      <button class="modal-close-btn" onclick="closeModal()">✕</button>
+
+      <div class="modal-top">
+        <div class="modal-logo">🎓</div>
+        <h2>AttendEase</h2>
+        <p>School Attendance Management System</p>
+      </div>
+
+      <div class="modal-tabs">
+        <button class="modal-tab active" id="tab-signin" onclick="switchTab('signin')">Sign In</button>
+        <button class="modal-tab" id="tab-signup" onclick="switchTab('signup')">Sign Up</button>
+      </div>
+
+      <!-- SIGN IN PANEL -->
+      <div id="panel-signin" class="modal-body">
+        <div id="signin-error" class="modal-error">❌ Invalid email or password. Please try again.</div>
+
+        <div class="mf-group">
+          <label>Email Address</label>
+          <input type="email" id="si-email" placeholder="teacher@school.edu" autocomplete="username" />
+        </div>
+        <div class="mf-group">
+          <label>Password</label>
+          <input type="password" id="si-pass" placeholder="Your password" autocomplete="current-password" />
+        </div>
+
+        <button class="btn-modal" onclick="handleSignIn()">Sign In →</button>
+
+        <div class="demo-creds">
+          <p>Demo Accounts</p>
+          <code onclick="fillDemo('priya.sharma@school.edu','teacher123')" style="cursor:pointer">▶ priya.sharma@school.edu / teacher123</code>
+          <code onclick="fillDemo('rajesh.kumar@school.edu','teacher456')" style="cursor:pointer">▶ rajesh.kumar@school.edu / teacher456</code>
+        </div>
+
+        <div class="modal-footer-note">
+          Don't have an account? <a href="#" onclick="switchTab('signup'); return false;" style="color:var(--mint)">Sign up free</a>
+        </div>
+      </div>
+
+      <!-- SIGN UP PANEL -->
+      <div id="panel-signup" class="modal-body" style="display:none">
+        <div id="signup-error"   class="modal-error"></div>
+        <div id="signup-success" class="modal-success">✅ Account created! You can now sign in.</div>
+
+        <div class="form-row">
+          <div class="mf-group">
+            <label>Full Name</label>
+            <input type="text" id="su-name" placeholder="Dr. Priya Sharma" />
+          </div>
+          <div class="mf-group">
+            <label>Subject</label>
+            <input type="text" id="su-subject" placeholder="Mathematics" />
+          </div>
+        </div>
+        <div class="mf-group">
+          <label>School Email</label>
+          <input type="email" id="su-email" placeholder="you@school.edu" />
+        </div>
+        <div class="mf-group">
+          <label>Password</label>
+          <input type="password" id="su-pass" placeholder="Create a password" />
+        </div>
+        <div class="mf-group">
+          <label>Your Classes (comma separated)</label>
+          <input type="text" id="su-classes" placeholder="10-A, 10-B, 11-A" />
+        </div>
+
+        <button class="btn-modal" onclick="handleSignUp()">Create Account →</button>
+
+        <div class="modal-footer-note">
+          Already have an account? <a href="#" onclick="switchTab('signin'); return false;" style="color:var(--mint)">Sign in</a>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
 
-<!-- ============================================
-     DASHBOARD
-============================================ -->
-<div id="dashboard" class="hidden">
+  <!-- ============================================================
+       SCRIPTS
+  ============================================================ -->
+  <script>
+    // ---- NAV SCROLL ----
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 40);
+    });
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <div class="sidebar-brand">
-        <div class="brand-icon">🎓</div>
-        <h2>AttendEase<span>Management System</span></h2>
-      </div>
-    </div>
+    // ---- SCROLL REVEAL ----
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+    }, { threshold: 0.12 });
 
-    <div class="teacher-info">
-      <div class="t-name" id="teacher-name">Teacher Name</div>
-      <div class="t-subject" id="teacher-subject">Subject</div>
-    </div>
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-    <nav class="sidebar-nav">
-      <div class="nav-section-label">Main</div>
-      <button class="nav-item active" data-page="overview">
-        <span class="nav-icon">📊</span><span>Overview</span>
-      </button>
-      <button class="nav-item" data-page="take">
-        <span class="nav-icon">✅</span><span>Take Attendance</span>
-      </button>
+    // ---- MODAL ----
+    function openModal(tab) {
+      document.getElementById('auth-modal').classList.add('active');
+      switchTab(tab || 'signin');
+      document.body.style.overflow = 'hidden';
+    }
 
-      <div class="nav-section-label">Manage</div>
-      <button class="nav-item" data-page="students">
-        <span class="nav-icon">👥</span><span>Students</span>
-      </button>
-      <button class="nav-item" data-page="reports">
-        <span class="nav-icon">📈</span><span>Reports</span>
-      </button>
+    function closeModal() {
+      document.getElementById('auth-modal').classList.remove('active');
+      document.body.style.overflow = '';
+    }
 
-      <div class="nav-section-label">Import</div>
-      <button class="nav-item" data-page="upload">
-        <span class="nav-icon">📤</span><span>Upload Excel</span>
-      </button>
-    </nav>
+    function closeAuthModal(e) {
+      if (e.target === document.getElementById('auth-modal')) closeModal();
+    }
 
-    <div class="sidebar-footer">
-      <button id="logout-btn" class="nav-item" style="color:rgba(255,255,255,0.5)">
-        <span class="nav-icon">🚪</span><span>Logout</span>
-      </button>
-    </div>
-  </aside>
+    function switchTab(tab) {
+      document.getElementById('tab-signin').classList.toggle('active', tab === 'signin');
+      document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
+      document.getElementById('panel-signin').style.display = tab === 'signin' ? 'block' : 'none';
+      document.getElementById('panel-signup').style.display = tab === 'signup' ? 'block' : 'none';
+      document.getElementById('signin-error').classList.remove('show');
+      document.getElementById('signup-error').classList.remove('show');
+      document.getElementById('signup-success').classList.remove('show');
+    }
 
-  <!-- MAIN CONTENT -->
-  <div class="main-content">
+    function fillDemo(email, pass) {
+      document.getElementById('si-email').value = email;
+      document.getElementById('si-pass').value  = pass;
+    }
 
-    <!-- TOP BAR -->
-    <header class="top-bar">
-      <div class="top-bar-left">
-        <h2 id="topbar-title">Welcome</h2>
-        <span id="topbar-subtitle">Dashboard Overview</span>
-      </div>
-      <div class="top-bar-right">
-        <div class="date-badge" id="date-badge">Today</div>
-      </div>
-    </header>
+    // ---- AUTH LOGIC (mirrors app.js localStorage) ----
+    function getUsers() {
+      try {
+        const d = JSON.parse(localStorage.getItem('users'));
+        if (d && d.teachers) return d;
+      } catch {}
+      // Seed default if missing
+      const defaults = {
+        teachers: [
+          { id:"T001", name:"Dr. Priya Sharma",  email:"priya.sharma@school.edu",  password:"teacher123", subject:"Mathematics", classes:["10-A","10-B","11-A"] },
+          { id:"T002", name:"Mr. Rajesh Kumar",  email:"rajesh.kumar@school.edu",  password:"teacher456", subject:"Science",      classes:["9-A","9-B","10-A"]  },
+          { id:"T003", name:"Ms. Anita Verma",   email:"anita.verma@school.edu",   password:"teacher789", subject:"English",      classes:["11-A","11-B","12-A"] }
+        ]
+      };
+      localStorage.setItem('users', JSON.stringify(defaults));
+      return defaults;
+    }
 
-    <!-- PAGE CONTENT -->
-    <div class="page-content">
+    function handleSignIn() {
+      const email = document.getElementById('si-email').value.trim();
+      const pass  = document.getElementById('si-pass').value;
+      const data  = getUsers();
+      const teacher = data.teachers.find(t => t.email === email && t.password === pass);
+      if (teacher) {
+        localStorage.setItem('session', JSON.stringify(teacher));
+        window.location.href = 'dashboard.html';
+      } else {
+        document.getElementById('signin-error').classList.add('show');
+        document.getElementById('si-pass').value = '';
+      }
+    }
 
-      <!-- ======== PAGE: OVERVIEW ======== -->
-      <div id="page-overview" class="page-section">
-        <div class="stats-grid">
-          <div class="stat-card blue">
-            <div class="stat-icon">👥</div>
-            <div class="stat-value" id="stat-students">—</div>
-            <div class="stat-label">My Students</div>
-          </div>
-          <div class="stat-card green">
-            <div class="stat-icon">🏫</div>
-            <div class="stat-value" id="stat-classes">—</div>
-            <div class="stat-label">My Classes</div>
-          </div>
-          <div class="stat-card green">
-            <div class="stat-icon">✅</div>
-            <div class="stat-value" id="stat-present">—</div>
-            <div class="stat-label">Present Today</div>
-          </div>
-          <div class="stat-card red">
-            <div class="stat-icon">❌</div>
-            <div class="stat-value" id="stat-absent">—</div>
-            <div class="stat-label">Absent Today</div>
-          </div>
-        </div>
+    function handleSignUp() {
+      const name    = document.getElementById('su-name').value.trim();
+      const subject = document.getElementById('su-subject').value.trim();
+      const email   = document.getElementById('su-email').value.trim();
+      const pass    = document.getElementById('su-pass').value;
+      const classes = document.getElementById('su-classes').value.split(',').map(c => c.trim()).filter(Boolean);
+      const errEl   = document.getElementById('signup-error');
 
-        <div class="card">
-          <div class="card-header">
-            <h3>Today's Class Summary</h3>
-            <button class="btn btn-secondary btn-sm" onclick="App.navigateTo('take')">Take Attendance →</button>
-          </div>
-          <div class="card-body">
-            <div id="class-summary"></div>
-          </div>
-        </div>
+      if (!name || !email || !pass) {
+        errEl.textContent = '❌ Name, email and password are required.';
+        errEl.classList.add('show');
+        return;
+      }
 
-        <style>
-          .class-row { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:0.8rem 0; border-bottom:1px solid var(--border); }
-          .class-row:last-child { border-bottom:none; }
-          .class-row-info strong { display:block; font-size:0.9rem; }
-          .class-row-info span { font-size:0.78rem; color:var(--text-muted); }
-          .class-row-bar { display:flex; align-items:center; gap:8px; min-width:160px; }
-          .class-row-bar small { font-size:0.78rem; color:var(--text-muted); font-weight:600; min-width:30px; text-align:right; }
-          .class-row-bar .progress-bar { flex:1; }
-        </style>
-      </div>
+      const data = getUsers();
+      if (data.teachers.find(t => t.email === email)) {
+        errEl.textContent = '❌ An account with this email already exists.';
+        errEl.classList.add('show');
+        return;
+      }
 
-      <!-- ======== PAGE: TAKE ATTENDANCE ======== -->
-      <div id="page-take" class="page-section hidden">
-        <div class="card" style="margin-bottom:1.5rem">
-          <div class="card-header">
-            <h3>📋 Mark Attendance</h3>
-          </div>
-          <div class="card-body">
-            <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:flex-end">
-              <div class="form-group" style="margin:0;flex:1;min-width:160px">
-                <label>Class</label>
-                <select id="att-class-select"></select>
-              </div>
-              <div class="form-group" style="margin:0;flex:1;min-width:160px">
-                <label>Date</label>
-                <input type="date" id="att-date" />
-              </div>
-              <button id="att-load-btn" class="btn btn-primary" style="width:auto">Load Students</button>
-            </div>
-          </div>
-        </div>
+      const newTeacher = {
+        id: 'T' + Date.now(),
+        name, subject, email, password: pass,
+        classes: classes.length ? classes : []
+      };
+      data.teachers.push(newTeacher);
+      localStorage.setItem('users', JSON.stringify(data));
 
-        <div class="card">
-          <div class="card-header">
-            <h3>Students</h3>
-            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-              <span id="att-counter" style="font-size:0.8rem;color:var(--text-muted);font-weight:500"></span>
-              <button id="mark-all-present" class="btn btn-success btn-sm">✓ All Present</button>
-              <button id="mark-all-absent"  class="btn btn-danger  btn-sm">✗ All Absent</button>
-              <button id="att-save-btn"     class="btn btn-primary  btn-sm">💾 Save</button>
-            </div>
-          </div>
-          <div class="card-body">
-            <div id="att-student-list">
-              <div class="empty-state">
-                <div class="empty-icon">📋</div>
-                <h3>Select a class and date</h3>
-                <p>Choose the class and date to begin marking attendance</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      errEl.classList.remove('show');
+      document.getElementById('signup-success').classList.add('show');
+      setTimeout(() => switchTab('signin'), 1800);
+    }
 
-      <!-- ======== PAGE: STUDENTS ======== -->
-      <div id="page-students" class="page-section hidden">
-        <div class="card">
-          <div class="card-header">
-            <h3>👥 Student Directory</h3>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-              <div class="search-bar">
-                <span class="search-icon">🔍</span>
-                <input type="text" id="student-search" placeholder="Search students..." />
-              </div>
-              <select id="student-class-filter" style="padding:0.5rem 0.8rem;border:1.5px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:0.85rem;background:var(--surface)"></select>
-              <button id="add-student-btn" class="btn btn-primary btn-sm">+ Add Student</button>
-            </div>
-          </div>
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>Roll No</th>
-                  <th>Name</th>
-                  <th>Class</th>
-                  <th>Phone</th>
-                  <th>Attendance %</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="student-tbody"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+    // ---- CONTACT FORM ----
+    function submitContact() {
+      const fname = document.getElementById('cf-fname').value.trim();
+      const email = document.getElementById('cf-email').value.trim();
+      const msg   = document.getElementById('cf-message').value.trim();
+      if (!fname || !email || !msg) { alert('Please fill in Name, Email and Message.'); return; }
+      document.getElementById('contact-success').classList.add('show');
+      ['cf-fname','cf-lname','cf-email','cf-school','cf-message'].forEach(id => document.getElementById(id).value = '');
+    }
 
-      <!-- ======== PAGE: REPORTS ======== -->
-      <div id="page-reports" class="page-section hidden">
-        <div class="card" style="margin-bottom:1.5rem">
-          <div class="card-header">
-            <h3>🔍 Filters</h3>
-          </div>
-          <div class="card-body">
-            <div class="report-filters">
-              <div class="form-group" style="margin:0">
-                <label>Class</label>
-                <select id="report-class-filter"></select>
-              </div>
-              <div class="form-group" style="margin:0">
-                <label>Date (single day)</label>
-                <input type="date" id="report-date-filter" />
-              </div>
-              <button id="report-clear-date" class="btn btn-secondary btn-sm">Clear Date</button>
-            </div>
-          </div>
-        </div>
+    // ---- ENTER KEY ON SIGNIN ----
+    document.getElementById('si-pass').addEventListener('keydown', e => {
+      if (e.key === 'Enter') handleSignIn();
+    });
 
-        <div class="card">
-          <div class="card-header">
-            <h3>📈 Attendance Report</h3>
-            <button class="btn btn-secondary btn-sm" onclick="Pages.reports.exportCSV && Pages.reports.exportCSV()">⬇ Export CSV</button>
-          </div>
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>Roll No</th>
-                  <th>Name</th>
-                  <th>Class</th>
-                  <th>Present</th>
-                  <th>Absent</th>
-                  <th>Late</th>
-                  <th>Overall %</th>
-                </tr>
-              </thead>
-              <tbody id="report-tbody"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+    // ---- ESC closes modal ----
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+  </script>
 
-      <!-- ======== PAGE: UPLOAD EXCEL ======== -->
-      <div id="page-upload" class="page-section hidden">
-        <div class="card" style="margin-bottom:1.5rem">
-          <div class="card-header"><h3>⚙️ Upload Settings</h3></div>
-          <div class="card-body">
-            <div class="form-group" style="max-width:300px">
-              <label>Target Class</label>
-              <select id="upload-class"></select>
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-header"><h3>📤 Import Students from Excel / CSV</h3></div>
-          <div class="card-body">
-
-            <div class="upload-zone" id="drop-zone">
-              <input type="file" id="file-input" accept=".xlsx,.xls,.csv" />
-              <div class="upload-icon">📄</div>
-              <h3>Drop your file here or click to browse</h3>
-              <p>Supports Excel (.xlsx, .xls) and CSV files<br>
-                 Columns: <strong>Name, Roll No, Phone, Parent Name, Parent Phone</strong></p>
-            </div>
-
-            <div style="margin-top:1rem;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;">
-              <p style="font-size:0.82rem;color:var(--text-muted);font-weight:600;margin-bottom:0.5rem;text-transform:uppercase;letter-spacing:0.05em">Expected Excel Format</p>
-              <div class="table-wrapper">
-                <table>
-                  <thead><tr><th>Name</th><th>Roll No</th><th>Phone</th><th>Parent Name</th><th>Parent Phone</th></tr></thead>
-                  <tbody>
-                    <tr><td>Aarav Singh</td><td>101</td><td>9876543210</td><td>Ramesh Singh</td><td>9876543200</td></tr>
-                    <tr><td>Diya Mehta</td><td>102</td><td>9876543211</td><td>Suresh Mehta</td><td>9876543201</td></tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <div id="upload-preview"></div>
-            <div style="margin-top:1rem">
-              <button id="upload-import-btn" class="btn btn-primary hidden">⬆ Import Students</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div><!-- /page-content -->
-  </div><!-- /main-content -->
-</div><!-- /dashboard -->
-
-
-<!-- ======== STUDENT MODAL ======== -->
-<div id="student-modal" class="modal-overlay hidden">
-  <div class="modal">
-    <div class="modal-header">
-      <h3 id="modal-student-title">Add Student</h3>
-      <button class="modal-close" id="close-student-modal">✕</button>
-    </div>
-    <div class="modal-body">
-      <input type="hidden" id="student-modal-id" />
-      <div class="form-group">
-        <label>Full Name *</label>
-        <input type="text" id="student-modal-name" placeholder="e.g. Aarav Singh" />
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
-        <div class="form-group">
-          <label>Roll Number *</label>
-          <input type="text" id="student-modal-roll" placeholder="e.g. 101" />
-        </div>
-        <div class="form-group">
-          <label>Class *</label>
-          <select id="student-modal-class"></select>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Student Phone</label>
-        <input type="tel" id="student-modal-phone" placeholder="10-digit mobile number" />
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
-        <div class="form-group">
-          <label>Parent / Guardian Name</label>
-          <input type="text" id="student-modal-parent" placeholder="Parent name" />
-        </div>
-        <div class="form-group">
-          <label>Parent Phone</label>
-          <input type="tel" id="student-modal-pphone" placeholder="Parent phone" />
-        </div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" id="cancel-student-btn">Cancel</button>
-      <button class="btn btn-primary" id="save-student-btn">Save Student</button>
-    </div>
-  </div>
-</div>
-
-<script src="js/app.js"></script>
 </body>
 </html>
