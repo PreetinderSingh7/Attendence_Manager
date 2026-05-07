@@ -11,6 +11,7 @@ No backend required — runs entirely in the browser using localStorage.
 attendance-manager/
 │
 ├── index.html              ← Main app (login + dashboard, all pages)
+|--- dashboard.html
 │
 ├── css/
 │   └── style.css           ← All styles (variables, layout, components)
